@@ -152,19 +152,19 @@ async def setup(ctx,param=" ", val=0):
                 listOfGlobals = globals()
                 listOfGlobals["erfid"] = val
                 await channel.send(f"Last used RF number was set to {val}.")
-            case "east.sk":
+            case "west.sk":
                 listOfGlobals = globals()
                 listOfGlobals["wskid"] = val
                 await channel.send(f"Last used SK number was set to {val}.")
-            case "east.sc":
+            case "west.sc":
                 listOfGlobals = globals()
                 listOfGlobals["wscid"] = val
                 await channel.send(f"Last used SC number was set to {val}.")
-            case "east.sr":
+            case "west.sr":
                 listOfGlobals = globals()
                 listOfGlobals["wsrid"] = val
                 await channel.send(f"Last used SR number was set to {val}.")
-            case "east.rf":
+            case "west.rf":
                 listOfGlobals = globals()
                 listOfGlobals["wrfid"] = val
                 await channel.send(f"Last used RF number was set to {val}.")
