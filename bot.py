@@ -45,7 +45,7 @@ def caseNumber(ctx, inCaseType):
     global sygnatures
     if caseType in sygnatures[ctx.message.guild.id][ctx.channel.id]['ids'].keys():
         sygnatures[ctx.message.guild.id][ctx.channel.id]['ids'][caseType] += 1
-        rslt = f"SK {sygnatures[ctx.message.guild.id][ctx.channel.id]['ids'][caseType]}/{year}"
+        rslt = f"{str.upper(caseType)} {sygnatures[ctx.message.guild.id][ctx.channel.id]['ids'][caseType]}/{year}"
     else:
         rslt = 0
     with open('data.yml', 'w') as f:
