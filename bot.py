@@ -95,7 +95,7 @@ async def sygn(ctx, caseType, caseName=" ", region="east"):
         thread = await msg.create_thread(name=result, auto_archive_duration=10080)
         await thread.add_user(usr)
     else:
-        await ctx.send(f"{ctx.message.author.mention}, You are not allowed to use this command here.1")
+        await ctx.send(f"{ctx.message.author.mention}, You are not allowed to use this command here.")
 
 @bot.command()
 async def setup(ctx,param=" ", val=0):
