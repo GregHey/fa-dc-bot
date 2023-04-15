@@ -1,71 +1,25 @@
-
 from discord.ext import commands
 import discord
-import datetime
 from dotenv import load_dotenv
 import os
-from utils import *
-import yaml
+from utils import *  
+
 load_dotenv()
 
 BOT_PREFIX = '!'
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-IS_VALID_CHANNEL = False
 
 bot = commands.Bot(command_prefix=BOT_PREFIX, intents=discord.Intents().all())
-if os.path.isfile('./data.yml'):
-    with open('data.yml', 'r') as file:
-        sygnatures = yaml.safe_load(file)
-else:
-    sygnatures = {
-        1058415477526896782: {'name': 'Fitz&Adams', 
-                            1058421816353366016: {'name': 'east', 'ids': {'sk': 100, 'sc': 100, 'sr': 100, 'rf': 100}},
-                            1069793385591877672: {'name': 'west', 'ids': {'sk': 10, 'sc': 10, 'sr': 10, 'rf': 10}}
-                            },
-        1089481656605347901: {'name': 'Hitmans',
-                            1093165214725320744: {'name': 'FA', 'ids': {'sk': 0, 'sc': 0, 'sr': 0, 'rf': 0}
-                            }
-                            },
-        1061423234559508531: {'name': 'Gregs',
-                            1096051901117771847: {'name': 'fa-bot', 'ids': {'sk': 0, 'sc': 0, 'sr': 0, 'rf': 0}
-                            }
-                            }
-    }
 
 @bot.event
 async def on_ready():
-        with open('data.yml', 'w') as f:
-            yaml.dump(sygnatures, f, default_flow_style=False)
         print("Hi, please use /!setup/ to use the bot")
-
-year = datetime.date.today().strftime("%Y")
-
-def caseNumber(ctx, inCaseType):
-    caseType = str.lower(inCaseType)
-    global sygnatures
-    if caseType in sygnatures[ctx.message.guild.id][ctx.channel.id]['ids'].keys():
-        sygnatures[ctx.message.guild.id][ctx.channel.id]['ids'][caseType] += 1
-        rslt = f"{str.upper(caseType)} {sygnatures[ctx.message.guild.id][ctx.channel.id]['ids'][caseType]}/{year}"
-    else:
-        rslt = 0
-    with open('data.yml', 'w') as f:
-        yaml.dump(sygnatures, f, default_flow_style=False)
-    return rslt
-
-async def checkAllowedChannel(channelId,serverId):
-    global sygnatures
-    if serverId in sygnatures.keys():
-        if channelId in sygnatures[serverId].keys():
-            rslt = True
-        else:
-            rslt = False
-    return rslt
 
 @bot.command()
 async def sygn(ctx, caseType, caseName=" "):
-    isAllowedChannel = await checkAllowedChannel(ctx.channel.id,ctx.message.guild.id)
+    isAllowedChannel = check_channel(ctx.channel.id,ctx.message.guild.id)
     if isAllowedChannel:
-        caseNum = caseNumber(ctx,caseType)
+        caseNum = get_case_number(ctx,caseType)
         if caseNum != 0:
             result =  f"{caseNum} {caseName}"
             msg = await ctx.send(f"{result}") 
@@ -73,7 +27,7 @@ async def sygn(ctx, caseType, caseName=" "):
             thread = await msg.create_thread(name=result, auto_archive_duration=10080)
             await thread.add_user(usr)
         else:
-            await ctx.send(f"Nieznany typ sprawy [{caseType}]! Wybierz jeden z dostępnych typów: {list(sygnatures[region].keys())}")
+            await ctx.send(f"Nieznany typ sprawy [{caseType}]! Wybierz jeden z dostępnych typów: {await get_case_types(ctx.message.guild.id,ctx.channel.id)}")
     else:
         await ctx.send(f"{ctx.message.author.mention}, Ta komenda nie jest obsługiwana na tym kanale.")
 
@@ -81,7 +35,6 @@ async def sygn(ctx, caseType, caseName=" "):
 async def setup(ctx,param=" ", val=0):
     if await is_owner(ctx.message.author.id):
         channel = ctx.channel
-        srv = ctx.message.guild
         match param:
             # case 'channel.east':
                 # if val == 0:
@@ -165,13 +118,16 @@ async def setup(ctx,param=" ", val=0):
         await ctx.send(f"ONLY FOR HITMAN")
 
 @bot.command()
-async def get_id (ctx):
+async def getserverid (ctx):
     print (ctx.message.guild.id)
     print (ctx.message.guild)
 
 @bot.command()
-async def info (ctx):
-    print (f"Generator sygnatur dla Fitz&Adams / ALO")
+async def botinfo (ctx):
+    await ctx.send(f"Generator sygnatur dla Fitz&Adams / ALO\n"
+                   "Dostępne komendy: \n"
+                   "!botinfo\n"
+                   "!sygn <typ sprawy> <nazwa / opis>"
+                   )
 
 bot.run(BOT_TOKEN)
-
